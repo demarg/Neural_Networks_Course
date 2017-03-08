@@ -1,0 +1,13 @@
+task 1:
+represent all numbers as vectors
+see them in hyperdimensional space
+maximum distance is radius
+check if sets overlap
+the larger the difference the better classification
+
+task 2:
+perceptron: accuracy on training set should be 100% because it's linearly separable
+
+speed-up functions in python: 
+pos max. value in vector (argmax), 
+how to calculate all possible distances (at once?)
