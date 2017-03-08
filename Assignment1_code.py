@@ -40,3 +40,16 @@ for i in range(0, 10):
     print("Distances from " + str(i))
     for j in range(i + 1, 10):
         print("to " + str(j) + ": " + str(mean_dists[i, j]))
+
+
+fig = plt.figure()
+ax = fig.add_subplot(111)
+dist_mat = ax.matshow(mean_dists)      
+fig.colorbar(dist_mat)
+ax.xaxis.set_ticks(range(0, 10))
+ax.yaxis.set_ticks(range(0, 10))
+ax.set_xticklabels(range(0, 10))
+ax.set_yticklabels(range(0, 10))
+plt.show()
+        
+    
