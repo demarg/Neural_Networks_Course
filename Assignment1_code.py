@@ -115,11 +115,35 @@ train_7 = train_in[train_out == 7]
 prior_5 = len(train_5) / (len(train_5) + len(train_7))
 prior_7 = len(train_7) / (len(train_5) + len(train_7))
 
-def lowsum(X, ratio):
-    index = range(256 - 16 * ratio, 256)
-    sum(row[index] for row in X)
+def lowsum(X, rows):
+    index = range(256 - 16 * rows, 256)
+    return np.array([sum(row[index]) for row in X])
+
+lowsum_5 = lowsum(train_5, 3) # lowest 3 rows in image
+lowsum_7 = lowsum(train_7, 3)
+
+min_val = min(np.concatenate([lowsum_5, lowsum_7]))
+max_val = max(np.concatenate([lowsum_5, lowsum_7]))
+
+bins = np.linspace(min_val, max_val, num = 10, endpoint = False)[1:] #10 boxes
+binned_5 = np.digitize(lowsum_5, bins)
+binned_7 = np.digitize(lowsum_7, bins)
+
+binprob_5 = np.array([sum(binned_5 == x) for x in range(0,10)]) / len(train_5)
+binprob_7 = np.array([sum(binned_7 == x) for x in range(0,10)]) / len(train_7)
+
+post_5 = prior_5 * binprob_5
+post_7 = prior_7 * binprob_7
+
+def classify(data):
+    ls = lowsum(data, 3)
+    binned = np.digitize(ls, bins)
+    return np.where(post_5[binned] > post_7[binned], 5, 7)
 
 
-    
+
+train_5_pred = post_5[binned_7] 
+train_7_pred = post_7[binned_7]
+train_5_pred = if binned_5 ==
 
 
