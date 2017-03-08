@@ -32,7 +32,12 @@ for d in range(0, 10):
     radiuses[d] = r_c
 
 dists = np.array([
-  [ci - cj for ci in centers] for cj in centers
+  [abs(ci - cj) for ci in centers] for cj in centers
 ])
 
-print(np.mean(dists, axis = 2))
+mean_dists = np.mean(dists, axis = 2)
+
+for i in range(0, 10):
+    print("Distances from " + str(i))
+    for j in range(i + 1, 10):
+        print("to " + str(j) + ": " + str(mean_dists[i, j]))
