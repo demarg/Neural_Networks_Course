@@ -31,24 +31,26 @@ train_out = np.loadtxt("data/train_out.csv", delimiter = ',')
 centers = np.array([None] * 10)
 radiuses = np.array([None] * 10)
 
+def dist(a, b):
+    return np.sqrt(np.sum((a - b) ** 2))
+
+
 for d in range(0, 10):
     train_d = train_in[train_out == d, ]
     c_d = np.mean(train_d, 0)
-    r_c = np.amax(abs(train_d - c_d), axis = 0)
+    r_c = np.amax(dist(train_d, c_d), axis = 0)
     centers[d] = c_d
     radiuses[d] = r_c
     print(str(d) + "s in training set: " + str(len(train_d)))
 
+
 dists = np.array([
-  [abs(ci - cj) for ci in centers] for cj in centers
+    [dist(ci, cj) for ci in centers] for cj in centers
 ])
-
-mean_dists = np.mean(dists, axis = 2)
-
 
 fig = plt.figure()
 ax = fig.add_subplot(111)
-dist_mat = ax.matshow(mean_dists)
+dist_mat = ax.matshow(dists)
 fig.colorbar(dist_mat)
 ax.xaxis.set_ticks(range(0, 10))
 ax.yaxis.set_ticks(range(0, 10))
@@ -60,7 +62,7 @@ plt.savefig("out/digit-dists.png")
 ##### Exercise 2
 def classify(point):
     return np.argmin(
-        [np.mean(abs(point - c)) for c in centers],
+        [np.mean(dist(point, c)) for c in centers],
         0
     )
 
