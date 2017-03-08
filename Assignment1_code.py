@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from __future__ import division
 import os
 import numpy as np
 import matplotlib.pyplot as plt
@@ -102,3 +103,23 @@ def ex1and2(distance_metric):
 
 for dist_metric in ['cityblock', 'cosine', 'euclidean', 'l1', 'l2', 'manhattan']:
     ex1and2(dist_metric)
+
+
+#####  Exercise 3
+
+train_5 = train_in[train_out == 5]
+train_7 = train_in[train_out == 7]
+
+# feature: take lower 1/x ratio of matrix and sum
+
+prior_5 = len(train_5) / (len(train_5) + len(train_7))
+prior_7 = len(train_7) / (len(train_5) + len(train_7))
+
+def lowsum(X, ratio):
+    index = range(256 - 16 * ratio, 256)
+    sum(row[index] for row in X)
+
+
+    
+
+
