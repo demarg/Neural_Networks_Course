@@ -5,6 +5,12 @@
 import os
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib import rcParams
+from sklearn import metrics
+from plot_confusion import plot_confusion_matrix
+
+rcParams.update({'figure.autolayout': True})
+
 
 # Set working directory to location of this file
 try:
@@ -31,6 +37,7 @@ for d in range(0, 10):
     r_c = np.amax(abs(train_d - c_d), axis = 0)
     centers[d] = c_d
     radiuses[d] = r_c
+    print(str(d) + "s in training set: " + str(len(train_d)))
 
 dists = np.array([
   [abs(ci - cj) for ci in centers] for cj in centers
@@ -47,7 +54,7 @@ ax.xaxis.set_ticks(range(0, 10))
 ax.yaxis.set_ticks(range(0, 10))
 ax.set_xticklabels(range(0, 10))
 ax.set_yticklabels(range(0, 10))
-#plt.show()
+plt.savefig("out/digit-dists.png")
 
 
 ##### Exercise 2
@@ -57,4 +64,18 @@ def classify(point):
         0
     )
 
-train_pred = [classify(point) for point in train_in]
+
+for set_name, set_in, set_out in [("training", train_in, train_out), ("test", test_in, test_out)]:
+    set_pred = [classify(point) for point in set_in]
+    correct = set_pred == set_out
+    print("Correctly classified in " + set_name + " set: " + str(np.sum(correct) / len(correct)))
+
+    cnf_matrix = metrics.confusion_matrix(set_out, set_pred, labels = range(0, 10))
+
+    fig = plt.figure()
+    plot_confusion_matrix(cnf_matrix,
+                          classes = range(0, 10),
+                          title='Confusion matrix of ' + set_name + ' set',
+                          normalize = True)
+
+    plt.savefig("out/" + set_name + "_confusion_matrix.png")
