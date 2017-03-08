@@ -11,3 +11,14 @@ perceptron: accuracy on training set should be 100% because it's linearly separa
 speed-up functions in python: 
 pos max. value in vector (argmax), 
 how to calculate all possible distances (at once?)
+
+task 4:
+
+check NN4 slide 44
+257 x 10 matrix, (256 + 1)
+
+general:
+don't need to explain concepts
+leaving out everything other students should know about is ok
+
+
