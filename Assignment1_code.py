@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+##### Exercise 1
+
 import os
 import numpy as np
 import matplotlib.pyplot as plt
@@ -36,20 +38,23 @@ dists = np.array([
 
 mean_dists = np.mean(dists, axis = 2)
 
-for i in range(0, 10):
-    print("Distances from " + str(i))
-    for j in range(i + 1, 10):
-        print("to " + str(j) + ": " + str(mean_dists[i, j]))
-
 
 fig = plt.figure()
 ax = fig.add_subplot(111)
-dist_mat = ax.matshow(mean_dists)      
+dist_mat = ax.matshow(mean_dists)
 fig.colorbar(dist_mat)
 ax.xaxis.set_ticks(range(0, 10))
 ax.yaxis.set_ticks(range(0, 10))
 ax.set_xticklabels(range(0, 10))
 ax.set_yticklabels(range(0, 10))
-plt.show()
-        
-    
+#plt.show()
+
+
+##### Exercise 2
+def classify(point):
+    return np.argmin(
+        [np.mean(abs(point - c)) for c in centers],
+        0
+    )
+
+train_pred = [classify(point) for point in train_in]
