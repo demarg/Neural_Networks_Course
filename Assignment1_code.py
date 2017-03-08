@@ -23,4 +23,5 @@ train_out = np.loadtxt("data/train_out.csv", delimiter = ',')
 
 for d in range(0, 10):
     train_d = train_in[train_out == d, ]
+    c_d = np.mean(train_d, 0)
     
