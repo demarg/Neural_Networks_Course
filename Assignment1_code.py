@@ -1,9 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Wed Mar 08 09:42:48 2017
-
-@author: Anonymous & Anonymous
-"""
 
 import os
 import numpy as np
@@ -31,10 +26,13 @@ for d in range(0, 10):
     train_d = train_in[train_out == d, ]
     c_d = np.mean(train_d, 0)
 
-    diff = [
-        [px - ]
-    ]
-    r_d = [img - c_d for img in train_d]
+    r_c = np.amax(abs(train_d - c_d), axis = 0)
 
     centers[d] = c_d
-    radiuses[d] = r_d
+    radiuses[d] = r_c
+
+dists = np.array([
+  [ci - cj for ci in centers] for cj in centers
+])
+
+print(np.mean(dists, axis = 2))
