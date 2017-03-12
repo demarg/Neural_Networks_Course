@@ -32,7 +32,7 @@ From here, we calculated the distances between the centers $dist_{ij} = dist(c_i
 
 # Task 2: Implement and evaluate the simplest classfier
 
-The distance measure developed before could now be used to classify the digits. To identify to which digit a 256-element sequence x (with true digit $i^{*}$) should be attributed, we calculated the distances between x and all $c_d$, such that we get our predicted digit $\hat{i} = \argmin_d{dist'(x, c_d)}$. Instead of just using the Euclidean distance, $dist'(.,.)$ here denotes various distance measures that were used for comparison: Cityblock, Cosine, Euclidean, L1, L2, and Manhattan.
+The distance measure developed before could now be used to classify the digits. To identify to which digit a 256-element sequence $x$ (with true digit $i^{*}$) should be attributed, we calculated the distances between $x$ and all $c_d$, such that we get our predicted digit $\hat{i} = \argmin_d{dist'(x, c_d)}$. Instead of just using the Euclidean distance, $dist'(.,.)$ here denotes various distance measures that were used for comparison: Cityblock, Cosine, Euclidean, L1, L2, and Manhattan.
 
 For each of these measures, the integer vector resulting from checking each sequence from the training set with $c_d$ was then compared to the vector of true digits. This was done for both the training set and the test set:
 
@@ -81,6 +81,45 @@ The best accuracies were achieved for the digits **1**, **3**, **6**, and **7**.
 
 # Task 3: Implement a Bayes Rule classifier
 
+A second approach to the problem is to construct and apply a Bayes Rule classifier by using an adequate binning procedure and calculating and comparing posterior probabilities. 
+
+For simplificity, here we only propose a way to achieve good classification between digits $d' = \{5, 7\}$, again by evaluating the training and test error. Our idea was to make a count of the values in the lower area of the 16 x 16 representative matrix, reasoning that we should find larger values (i.e. more "ink") when a **5** was written down as compared to a **7**. To find out how large the lower area should be, we simulated it for all possible amounts of rows in the matrix and chose the one with the lowest test error.
+
+First, priors needed to be constructed, reflecting the relative amount of occurrences of the two digits in the training set: 
+
+$P(D = 5) = \frac{P(D = 5)}{P(D = 5) + P(D = 7)} = \frac{88}{88 + 166} = 0.346$ , 
+$P(D = 7) = \frac{P(D = 7)}{P(D = 5) + P(D = 7)} = \frac{166}{88 + 166} = 0.654$
+
+From there, we divided the full range of possible values for the two digits $x \in \{X_{D = 5}, X_{D = 7}\}$ into 10 equally wide bins, whereas each of the bins was containing a relevant portion of the range. This was established by extracting the smallest and largest value, dividing the full interval into 10 parts, and using the 9 resulting inner boundaries as the separators between the bins. Thus, for both digits, we ended up with binned $x' \in \{1, 2, ..., 10\}$.
+
+It was then possible to obtain the likelihoods $P(x' \mid D = 5)$ and $P(x' \mid D = 7)$, by dividing the number of samples in a corresponding bin by the number of all samples for a given digit. Now we only had to apply Bayes rule, which translates as the following (excluding the normalization constant which can be ignored):
+
+$$ P(D = d' \mid x') \propto P(x' \mid D = d') P(D = d') $$
+
+The most successful classifier was the one which summed the lowest 2 rows of the 16 x 16 matrix. The posterior distributions for both digits were summarized in the following plot:
+
+\begin{figure}[h]%
+    \centering
+    \includegraphics[width=10cm]{out/3_posteriors_2.png}%
+    \caption{Histograms of posterior probabilities for binned $x'$ for digit 5 and 7}%
+    \label{fig:posteriors_binned}%
+\end{figure}
+
+The posterior distributions indicate that from the 4th bin upwards (starting at around -20.5 in our arbitrary unit space), $x$ should be classified as a **5**, otherwise as a **7**. This achieved an accuracy of 92% on the training set and, surprisingly, an even larger accuracy of 94% on the test set
+
+
+
+```{r}
+Rows <- c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
+Trainingset <- c(0.90551181102362199, 0.92125984251968507, 0.92519685039370081, 0.91338582677165359, 0.89370078740157477, 0.87401574803149606, 0.86614173228346458, 0.87007874015748032, 0.87401574803149606, 0.86614173228346458, 0.86220472440944884, 0.82283464566929132, 0.80314960629921262, 0.77165354330708658, 0.77952755905511806, 0.77952755905511806)
+Testset <- c(0.90756302521008403, 0.94117647058823528, 0.9327731092436975, 0.91596638655462181, 0.89915966386554624, 0.84873949579831931, 0.83193277310924374, 0.81512605042016806, 0.82352941176470584, 0.77310924369747902, 0.78151260504201681, 0.72268907563025209, 0.72268907563025209, 0.72268907563025209, 0.68907563025210083, 0.68907563025210083)
+plot(Rows, Trainingset)
+plot(Rows, Testset)
+
+library(ggplot2)
+ggplot()
+
+```
 
 
 
