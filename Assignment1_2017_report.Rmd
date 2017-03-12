@@ -130,3 +130,6 @@ ggplot(df, aes(x = Rows, y = Accuracy, colour = Set)) + geom_line() + theme_bw()
 
 
 # Task 5: Find the best possible model with existing software
+
+Michael Nielsen presents his Neural Networks software in his book "Neural Networks and Deep Learning" (http://neuralnetworksanddeeplearning.com/index.html). We adapted his code to run it over our data set. 
+
