@@ -26,6 +26,8 @@ test_out = np.loadtxt("data/tets_out.csv", delimiter = ',')
 train_in = np.loadtxt("data/train_in.csv", delimiter = ',')
 train_out = np.loadtxt("data/train_out.csv", delimiter = ',')
 
+print("\nExercise 1 & 2\n")
+
 for d in range(10):
     print("{digit}s in training set: {count}".format(digit = d, count = np.sum(train_out == d)))
 
@@ -74,6 +76,7 @@ def ex1and2(distance_metric):
     ax.set_xticklabels(range(10))
     ax.set_yticklabels(range(10))
     plt.savefig("out/1_{}_digit-dists.png".format(distance_metric))
+    plt.close()
 
 
     ##### Exercise 2
@@ -98,6 +101,7 @@ def ex1and2(distance_metric):
                               normalize = True)
 
         plt.savefig("out/2_{}_{}_confusion_matrix.png".format(distance_metric, set_name))
+        plt.close()
 
 
 
@@ -109,60 +113,83 @@ def ex1and2(distance_metric):
 
 #####  Exercise 3
 
+print("\nExercise 3\n")
+
 train_5 = train_in[train_out == 5]
 train_7 = train_in[train_out == 7]
-
-# feature: take lower 1/x ratio of matrix and sum
+test_5 = test_in[test_out == 5]
+test_7 = test_in[test_out == 7]
 
 prior_5 = len(train_5) / (len(train_5) + len(train_7))
 prior_7 = len(train_7) / (len(train_5) + len(train_7))
 
-def lowsum(X, n):
-    """
-    Sum up the last n rows of each digit image
-    """
-    index = range(256 - 16 * n, 256)
-    return np.array([sum(point[index]) for point in X])
 
-lowsum_5 = lowsum(train_5, 3) # lowest 3 rows in image
-lowsum_7 = lowsum(train_7, 3)
+class BayesClassifier:
+    def __init__(self, rows):
+        self.rows = rows
 
-min_val = min(np.concatenate([lowsum_5, lowsum_7]))
-max_val = max(np.concatenate([lowsum_5, lowsum_7]))
+        lowsum_5 = self.lowsum(train_5) # lowest 3 rows in image
+        lowsum_7 = self.lowsum(train_7)
 
-bins = np.linspace(min_val, max_val, num = 10, endpoint = False) # 10 bins, array of the left boundaries
-bin_limits = bins[1:] # get the limits between bins for use with np.digitize
-def bin_features(features):
-    return np.digitize(features, bin_limits)
+        min_val = min(np.concatenate([lowsum_5, lowsum_7]))
+        max_val = max(np.concatenate([lowsum_5, lowsum_7]))
 
-binned_5 = bin_features(lowsum_5)
-binned_7 = bin_features(lowsum_7)
+        bins = np.linspace(min_val, max_val, num = 10, endpoint = False) # 10 bins, array of the left boundaries
+        self.bin_limits = bins[1:] # get the limits between bins for use with np.digitize
 
-binprob_5 = np.array([sum(binned_5 == x) for x in range(10)]) / len(train_5)
-binprob_7 = np.array([sum(binned_7 == x) for x in range(10)]) / len(train_7)
+        binned_5 = self.bin_features(lowsum_5)
+        binned_7 = self.bin_features(lowsum_7)
 
-post_5 = prior_5 * binprob_5
-post_7 = prior_7 * binprob_7
+        binprob_5 = np.array([sum(binned_5 == x) for x in range(10)]) / len(train_5)
+        binprob_7 = np.array([sum(binned_7 == x) for x in range(10)]) / len(train_7)
 
-def classify(data):
-    ls = lowsum(data, 3)
-    binned = bin_features(ls)
-    return np.where(post_5[binned] > post_7[binned], 5, 7)
+        self.post_5 = prior_5 * binprob_5
+        self.post_7 = prior_7 * binprob_7
+
+        # histogram of likelihoods
+        fig, ax = plt.subplots()
+        width = bins[1] - bins[0]
+        rects1 = ax.bar(bins, binprob_5, width = width, color = (0, 0, 1, 0.5))
+        rects2 = ax.bar(bins, binprob_7, width = width, color = (0, 1, 0, 0.5))
+        ax.legend((rects1[0], rects2[0]), ('5', '7'))
+        plt.savefig("out/3_likelihoods_{}.png".format(rows))
+        plt.close()
+
+        # histogram of posteriors
+        fig, ax = plt.subplots()
+        width = bins[1] - bins[0]
+        rects1 = ax.bar(bins, self.post_5, width = width, color = (0, 0, 1, 0.5))
+        rects2 = ax.bar(bins, self.post_7, width = width, color = (0, 1, 0, 0.5))
+        ax.legend((rects1[0], rects2[0]), ('5', '7'))
+        plt.savefig("out/3_posteriors_{}.png".format(rows))
+        plt.close()
 
 
-# histograms
-fig, ax = plt.subplots()
-width = bins[1] - bins[0]
-rects1 = ax.bar(bins, binprob_5, width = width, color = (0, 0, 1, 0.5))
-rects2 = ax.bar(bins, binprob_7, width = width, color = (0, 1, 0, 0.5))
-ax.legend((rects1[0], rects2[0]), ('5', '7'))
-plt.savefig("out/3_histogram.png")
+    # Feature: take sum of lower n rows of matrix
+    def lowsum(self, X):
+        """
+        Sum up the last n rows of each digit image
+        """
+        index = range(256 - 16 * self.rows, 256)
+        return np.array([sum(point[index]) for point in X])
+
+    def bin_features(self, features):
+        return np.digitize(features, self.bin_limits)
+
+    def classify(self, X):
+        ls = self.lowsum(X)
+        binned = self.bin_features(ls)
+        return np.where(self.post_5[binned] > self.post_7[binned], 5, 7)
 
 
-print("Correctly classified 5s in training set: {} out of {}".format(np.sum(classify(train_5) == 5), len(train_5)))
-print("Correctly classified 7s in training set: {} out of {}".format(np.sum(classify(train_7) == 5), len(train_7)))
+    def report_accuracy(self, set_name, in_5, in_7):
+        correct_5 = np.sum(self.classify(in_5) == 5)
+        correct_7 = np.sum(self.classify(in_7) == 7)
+        accuracy = (correct_5 + correct_7) / (len(in_5) + len(in_7))
+        print("Accuracy in {} set with {} rows: {:.2f}".format(set_name, self.rows, accuracy))
 
-test_5 = test_in[test_out == 5]
-test_7 = test_in[test_out == 7]
-print("Correctly classified 5s in test set: {} out of {}".format(np.sum(classify(test_5) == 5), len(test_5)))
-print("Correctly classified 7s in test set: {} out of {}".format(np.sum(classify(test_7) == 5), len(test_7)))
+
+for rows in range(1, 17):
+    cls = BayesClassifier(rows)
+    #cls.report_accuracy("training", train_5, train_7)
+    cls.report_accuracy("test", test_5, test_7)
