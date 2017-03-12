@@ -26,7 +26,7 @@ test_out = np.loadtxt("data/tets_out.csv", delimiter = ',')
 train_in = np.loadtxt("data/train_in.csv", delimiter = ',')
 train_out = np.loadtxt("data/train_out.csv", delimiter = ',')
 
-for d in range(0, 10):
+for d in range(10):
     print("{digit}s in training set: {count}".format(digit = d, count = np.sum(train_out == d)))
 
 
@@ -53,7 +53,7 @@ def ex1and2(distance_metric):
     centers = np.array([None] * 10)
     radiuses = np.array([None] * 10)
 
-    for d in range(0, 10):
+    for d in range(10):
         train_d = train_in[train_out == d, ]
         c_d = np.mean(train_d, 0)
         r_c = np.amax(dist(train_d, c_d), axis = 0)
@@ -69,11 +69,11 @@ def ex1and2(distance_metric):
     ax = fig.add_subplot(111)
     dist_mat = ax.matshow(dists)
     fig.colorbar(dist_mat)
-    ax.xaxis.set_ticks(range(0, 10))
-    ax.yaxis.set_ticks(range(0, 10))
-    ax.set_xticklabels(range(0, 10))
-    ax.set_yticklabels(range(0, 10))
-    plt.savefig("out/{}_digit-dists.png".format(distance_metric))
+    ax.xaxis.set_ticks(range(10))
+    ax.yaxis.set_ticks(range(10))
+    ax.set_xticklabels(range(10))
+    ax.set_yticklabels(range(10))
+    plt.savefig("out/1_{}_digit-dists.png".format(distance_metric))
 
 
     ##### Exercise 2
@@ -89,15 +89,15 @@ def ex1and2(distance_metric):
         correct = set_pred == set_out
         print("Correctly classified in {} set: {}".format(set_name, np.sum(correct) / len(correct)))
 
-        cnf_matrix = metrics.confusion_matrix(set_out, set_pred, labels = range(0, 10))
+        cnf_matrix = metrics.confusion_matrix(set_out, set_pred, labels = range(10))
 
         fig = plt.figure()
         plot_confusion_matrix(cnf_matrix,
-                              classes = range(0, 10),
+                              classes = range(10),
                               title='Confusion matrix of {} set'.format(set_name),
                               normalize = True)
 
-        plt.savefig("out/{}_{}_confusion_matrix.png".format(distance_metric, set_name))
+        plt.savefig("out/2_{}_{}_confusion_matrix.png".format(distance_metric, set_name))
 
 
 
@@ -130,15 +130,16 @@ lowsum_7 = lowsum(train_7, 3)
 min_val = min(np.concatenate([lowsum_5, lowsum_7]))
 max_val = max(np.concatenate([lowsum_5, lowsum_7]))
 
-bins = np.linspace(min_val, max_val, num = 10, endpoint = False)[1:] #10 boxes
+bins = np.linspace(min_val, max_val, num = 10, endpoint = False) # 10 bins, array of the left boundaries
+bin_limits = bins[1:] # get the limits between bins for use with np.digitize
 def bin_features(features):
-    np.digitize(features, bins)
+    return np.digitize(features, bin_limits)
 
 binned_5 = bin_features(lowsum_5)
 binned_7 = bin_features(lowsum_7)
 
-binprob_5 = np.array([sum(binned_5 == x) for x in range(0,10)]) / len(train_5)
-binprob_7 = np.array([sum(binned_7 == x) for x in range(0,10)]) / len(train_7)
+binprob_5 = np.array([sum(binned_5 == x) for x in range(10)]) / len(train_5)
+binprob_7 = np.array([sum(binned_7 == x) for x in range(10)]) / len(train_7)
 
 post_5 = prior_5 * binprob_5
 post_7 = prior_7 * binprob_7
@@ -149,5 +150,19 @@ def classify(data):
     return np.where(post_5[binned] > post_7[binned], 5, 7)
 
 
+# histograms
+fig, ax = plt.subplots()
+width = bins[1] - bins[0]
+rects1 = ax.bar(bins, binprob_5, width = width, color = (0, 0, 1, 0.5))
+rects2 = ax.bar(bins, binprob_7, width = width, color = (0, 1, 0, 0.5))
+ax.legend((rects1[0], rects2[0]), ('5', '7'))
+plt.savefig("out/3_histogram.png")
 
-##### Exercise 4
+
+print("Correctly classified 5s in training set: {} out of {}".format(np.sum(classify(train_5) == 5), len(train_5)))
+print("Correctly classified 7s in training set: {} out of {}".format(np.sum(classify(train_7) == 5), len(train_7)))
+
+test_5 = test_in[test_out == 5]
+test_7 = test_in[test_out == 7]
+print("Correctly classified 5s in test set: {} out of {}".format(np.sum(classify(test_5) == 5), len(test_5)))
+print("Correctly classified 7s in test set: {} out of {}".format(np.sum(classify(test_7) == 5), len(test_7)))
