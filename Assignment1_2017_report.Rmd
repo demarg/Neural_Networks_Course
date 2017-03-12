@@ -1,0 +1,60 @@
+---
+title: "Assignment 1: Classifying Images of Handwritten Digits"
+author: "Anonymous & Anonymous"
+date: "12 March 2017"
+output: 
+  pdf_document:
+      fig_width: 4
+      fig_height: 3
+
+---
+
+# Introduction
+
+The goal of this assignment is to get a broader understanding of several algorithms for the classification of handwritten digits. The data set we are using for this purpose contains 2707 digits, each one represented by a vector of 256 elements (i.e. a flattened 16 x 16 matrix) and a corresponding true digit number it is supposed to display. For evaluation, the data is split into a training set (1707 images) and a test set (1000 images). In the following, we developed our own classifiers to predict digits with the 256-element vector and tested existing ones, being primarily interested in their accuracy on both the training and the test set. 
+
+# Task 1: Analyze Distances Between Images
+
+First it is a good idea to identify which of the digits $d = 0, 1, ..., 9$ are difficult to distinguish from each other. Considering the 256-dimensional space $C_d$, we identified, for each digit: 
+- the center $c_i$ by summing over all instances and dividing by the amount $n_i$ 
+- the radius $r_i = \max{dist(C_d, c_i)}$, the maximum distance of the points from the center, where $dist(.,.)$ denotes the Euclidean distance measure.
+
+From here, we calculated the distances between the centers $dist_{ij} = dist(c_i, c_j)$ for $i, j = 0, 1, ..., 9$ of the 10 clouds resembling the digits and observe which ones lie close or far from each other: 
+
+![Euclidean distance between centers. Smaller values indicate more proximity in the 256-dimensional space.](out/euclidean_digit-dists.png)
+
+(Obviously, the diagonal is of zero distance because it is just comparing the same digits with each other.) Based on our observations we noticed that classification should be comparably easy when comparing, for instance, 0 with 1, 0 with 7, 1 with 3, or 6 with 7. Conversely, we might face difficulties classifying between 3 and 5, 4 and 9, or 7 and 9. It turned out that 0 and 1 are overall rather easy to classify (located more remote in the high-dimensional space), whereas 8 and 9 are more intertwined with other numbers (located more in the center). We therefore expect their accuracy to be worse than for 0 and 1.
+
+# Task 2: Implement and evaluate the simplest classfier
+
+```{r fig.width=4, fig.height=3,echo=FALSE}
+library(png)
+library(grid)
+img <- readPNG("out/euclidean_training_confusion_matrix.png")
+img2 <- readPNG("out/cityblock_training_confusion_matrix.png")
+img3 <- readPNG("out/cosine_training_confusion_matrix.png")
+ grid.raster(img, img2, img3)
+```
+
+
+<div style="width:100px; height=70px">
+![Euclidean distance](out/euclidean_training_confusion_matrix.png) | ![Cityblock distance](out/cityblock_training_confusion_matrix.png) | ![Cosine distance](out/cosine_training_confusion_matrix.png)
+</div>
+
+
+
+![L1 distance](out/l1_training_confusion_matrix.png) ![L2 distance](out/l2_training_confusion_matrix.png) ![Manhattan distance](out/manhattan_training_confusion_matrix.png)
+
+```{r, out.wi}
+
+```
+
+
+# Task 3: Implement a Bayes Rule classifier
+
+
+# Task 4: Implement a multi-class perceptron algorithm
+ 
+
+
+# Task 5: Find the best possible model with existing software
