@@ -5,6 +5,7 @@ date: "12 March 2017"
 output: pdf_document
 header-includes:
   - \usepackage{subfig}
+  - \newcommand{\argmin}{\operatornamewithlimits{argmin}}
 ---
 
 # Introduction
@@ -18,7 +19,7 @@ First it is a good idea to identify which of the digits $d = 0, 1, ..., 9$ are d
 - the center $c_i$ by summing over all instances and dividing by the amount $n_i$
 - the radius $r_i = \max{dist(C_d, c_i)}$, the maximum distance of the points from the center, where $dist(.,.)$ denotes the Euclidean distance measure.
 
-From here, we calculated the distances between the centers $dist_{ij} = dist(c_i, c_j)$ for $i, j = 0, 1, ..., 9$ of the 10 clouds resembling the digits and observe which ones lie close or far from each other:
+From here, we calculated the distances between the centers $dist_{ij} = dist(c_i, c_j)$ for $i, j = 0, 1, ..., 9$ of the 10 clouds resembling the digits and observe which ones lie close or far from each other in the form of a heatmap:
 
 \begin{figure}[h]%
     \centering
@@ -27,11 +28,29 @@ From here, we calculated the distances between the centers $dist_{ij} = dist(c_i
     \label{fig:euclidean_dist}%
 \end{figure}
 
-(Obviously, the diagonal is of zero distance because it is just comparing the same digits with each other.) Based on our observations we noticed that classification should be comparably easy when comparing, for instance, 0 with 1, 0 with 7, 1 with 3, or 6 with 7. Conversely, we might face difficulties classifying between 3 and 5, 4 and 9, or 7 and 9. It turned out that 0 and 1 are overall rather easy to classify (located more remote in the high-dimensional space), whereas 8 and 9 are more intertwined with other numbers (located more in the center). We therefore expect their accuracy to be worse than for 0 and 1.
+(Obviously, the diagonal is of zero distance because it is just comparing the same digits with each other.) Based on our observations we noticed that classification should be comparably easy when comparing, for instance, **0** with **1**, **0** with **7**, **1** with **3**, or **6** with **7**. Conversely, we might face difficulties classifying between **3** and **5**, **4** and **9**, or **7** and **9**. It turned out that **0** and **1** are overall rather easy to classify (located more remote in the high-dimensional space), whereas **8** and **9** are more intertwined with other numbers (located more in the center). We therefore expect their accuracy to be worse than for **0** and **1**.
 
 # Task 2: Implement and evaluate the simplest classfier
 
-The distance measure developed before could now be used to clasify the digits.
+The distance measure developed before could now be used to classify the digits. To identify to which digit a 256-element sequence x (with true digit $i^{*}$) should be attributed, we calculated the distances between x and all $c_d$, such that we get our predicted digit $\hat{i} = \argmin_d{dist'(x, c_d)}$. Instead of just using the Euclidean distance, $dist'(.,.)$ here denotes various distance measures that were used for comparison: Cityblock, Cosine, Euclidean, L1, L2, and Manhattan.
+
+For each of these measures, the integer vector resulting from checking each sequence from the training set with $c_d$ was then compared to the vector of true digits. This was done for both the training set and the test set:
+
+```{r echo = F}
+measure <- c('cityblock', 'cosine', 'euclidean', 'l1', 'l2', 'manhattan')
+trainset <- c(0.7656707674282367, 0.8605741066198008,0.8635032220269478, 0.7656707674282367,  0.8635032220269478, 0.7656707674282367)
+trainset <- round(trainset, 2)
+testset <- c(0.721, 0.799, 0.804, 0.721, 0.804, 0.721)
+testset <- round(testset, 2)
+accs <- data.frame(measure, trainset, testset)
+library(knitr)
+kable(accs)
+```
+
+Accuracies on both the training set and test set were relatively good. This shows that a distance measure explains quite a lot of the differences between the digits. Interestingly, Cosine, Euclidean, and L2 outperformed the others (with Cosine being very slighlty worse than Euclidean and L2, which had equal scores). This should be due to the nature of how the distance is measured; more specifically, whether the formula for the measure includes squared terms or only non-squared terms. This makes sense, intuitively, because squaring allows for describing a relationship in a second-order polynomial, which pronounces large differences that can aid in differentiating between digits.
+Our confidence in working with the Euclidean measure for digit classification was strengthened when looking at the accuracies.
+
+To get a more nuanced view, confusion matrices were created. This was again done with the training set (column b) and the test set (column c):
 
 ```{r results='asis', echo=F}
 capitalize <- function(x) {
@@ -54,9 +73,15 @@ for (dist in c('cityblock', 'cosine', 'euclidean', 'l1', 'l2', 'manhattan')) {
 }
 ```
 
+Confusion matrices assist in understanding where misclassification happens. Importantly, the diagonal matrix mostly contained values larger than .50, which means that for a given digit at least half of the predictions were accurate, which is in line with the accuracy table above. As before there are clear differences between the squared distances and the non-squared distances, especially when it comes to predicting the digit **1**. While all distance measures were really good at classifying **1**s as **1**s (i.e. high sensitivity), the non-squared distance measures often classified other numbers as **1**s too (i.e. low specificity). This pattern was almost not present at all in the squared distance measures (compare columns for digit 1 in confusion matrices).
 
+A typical misclassification that happened was that a **9** was predicted even though the true digit was a **4**. This was already to be expected from exploring the heatmap in Task 1. Curiously, other comparisons which were seen as problematic did not cause as much misclassification.
+
+The best accuracies were achieved for the digits **1**, **3**, **6**, and **7**. Worst classification happened for **2**, **4**, and **5**. Contrarily to our expectations, **8** and **9** were classified relatively well, even though the heatmaps suggested otherwise.
 
 # Task 3: Implement a Bayes Rule classifier
+
+
 
 
 # Task 4: Implement a multi-class perceptron algorithm
