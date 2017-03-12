@@ -17,7 +17,7 @@ knitr::opts_chunk$set(fig.pos = 'H!')
 
 # Introduction
 
-The goal of this assignment is to get a broader understanding of several algorithms for the classification of handwritten digits. The data set we are using for this purpose contains images of 2707 handwritten digits, each one represented by a vector of 256 elements (i.e. a flattened 16 x 16 matrix) and the corresponding true digit it is supposed to display. For evaluation, the data is split into a training set (1707 images) and a test set (1000 images). In the following, we developed our own classifiers to predict digits with the 256-element vector and tested existing ones, being primarily interested in their accuracy on both the training and the test set.
+The goal of this assignment is to get a broader understanding of several algorithms for the classification of handwritten digits. The data set we are using for this purpose contains images of 2707 handwritten digits, each one represented by a vector of 256 elements (i.e. a flattened $16 \times 16$ matrix) and the corresponding true digit it is supposed to display. For evaluation, the data is split into a training set (1707 images) and a test set (1000 images). In the following, we developed our own classifiers to predict digits with the 256-element vector and tested existing ones, being primarily interested in their accuracy on both the training and the test set.
 
 # Task 1: Analyze Distances Between Images
 
@@ -90,7 +90,7 @@ The best accuracies were achieved for the digits **1**, **3**, **6**, and **7**.
 
 A second approach to the problem is to construct and apply a Bayes Rule classifier by using an adequate binning procedure and calculating and comparing posterior probabilities. 
 
-For simplificity, here we only propose a way to achieve good classification between digits $d' = \{5, 7\}$, again by evaluating the training and test error. Our idea was to make a count of the values in the lower area of the 16 x 16 representative matrix, reasoning that we should find larger values (i.e. more "ink") when a **5** was written down as compared to a **7**. To find out how large the lower area should be, we simulated it for all possible amounts of rows in the matrix and chose the one with the lowest test error.
+For simplificity, here we only propose a way to achieve good classification between digits $d' = \{5, 7\}$, again by evaluating the training and test error. Our idea was to make a count of the values in the lower area of the $16 \times 16$ representative matrix, reasoning that we should find larger values (i.e. more "ink") when a **5** was written down as compared to a **7**. To find out how large the lower area should be, we simulated it for all possible amounts of rows in the matrix and chose the one with the lowest test error.
 
 First, priors needed to be constructed, reflecting the relative amount of occurrences of the two digits in the training set: 
 
@@ -103,7 +103,7 @@ It was then possible to obtain the likelihoods $P(x' \mid D = 5)$ and $P(x' \mid
 
 $$ P(D = d' \mid x') \propto P(x' \mid D = d') P(D = d') $$
 
-The most successful classifier was the one which summed the lowest 2 rows of the 16 x 16 matrix. The posterior distributions for both digits were summarized in the following plot:
+The most successful classifier was the one which summed the lowest 2 rows of the $16 \times 16$ matrix. The posterior distributions for both digits were summarized in the Figure 8:
 
 \begin{figure}[H]%
     \centering
@@ -112,7 +112,7 @@ The most successful classifier was the one which summed the lowest 2 rows of the
     \label{fig:posteriors_binned}%
 \end{figure}
 
-The posterior distributions indicate that from the 4th bin upwards (starting at around -20.5 in our arbitrary unit space), $x$ should be classified as a **5**, otherwise as a **7**. This achieved an accuracy of 92% on the training set and, rather surprisingly, an even larger accuracy of 94% on the test set. Overall, taking between 1 and 4 lowest rows of the 16 x 16 matrix resulted in a high accuracy:
+The posterior distributions indicate that from the 4th bin upwards (starting at around -20.5 in our arbitrary unit space), $x$ should be classified as a **5**, otherwise as a **7**. This achieved an accuracy of 92% on the training set and, rather surprisingly, an even larger accuracy of 94% on the test set. Overall, taking between 1 and 4 lowest rows of the $16 \times 16$ matrix resulted in a high accuracy, as seen in Figure 9.
 
 ```{r echo = F, warning=F, fig.height=2.5, fig.width=4, fig.cap="Classification accuracy for amount of lower rows chosen"}
 Rows <- c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
@@ -126,9 +126,14 @@ ggplot(df, aes(x = Rows, y = Accuracy, colour = Set)) + geom_line() + theme_bw()
 ```
 
 
-
 # Task 4: Implement a multi-class perceptron algorithm
-Some text:
+Finally, we implemented a single-layer perceptron with 10 nodes, one to signify each digit. Since we knew that the the data are linearly separable, we used a slightly adapted version of the Generalized Perceptron Algorithm (Duda et al.), which runs until perfect accuracy is achieved on the training data. 
+
+Using the update formulas $w = w - x$ and $w = w + x$ for too active and not active enough nodes respectively, resulted in all weights rapidly decreasing, until the activations from any input were too small for Python to store and being treated as 0. At that point, no meaningful classification could occur, as all nodes had equal activations, and the algorithm got stuck.
+
+To fix this issue we introduced a learning rate parameter $\eta$, updating weights by $w = w \pm \eta x$ instead. This is very similar to the Adaline algorithm, which suggests using $w = w + \eta x (d - y)$ on a random data point, where $d$ is the desired output and $y$ the output of the network. The term $x (d - y)$ is approximated in our algorithm by the term $sx$, where nodes with a higher activation than the correct node were *counteracted* using $s = -1$, and the underactivated correct node *boosted* using $s = 1$.
+
+Figure 10 shows the convergence of the network using different learning rates. It suggests that a rate of around 0.05 to 0.1 is optimal, as larger values can lead to the network collapsing and lower ones just converge slower.
 
 ```{r echo = F, warning=F, fig.height=2.5, fig.width=4, fig.cap="Convergence of perceptron for different learning rates"}
 df = data.frame()
@@ -163,7 +168,7 @@ ggplot(df[df$iter < 2800, ], aes(x = iter, y = acc, colour = rate)) + geom_line(
   labs(x = "Iterations", y = "Accuracy", colour = "Learning rate")
 ```
 
-
+When this network was trained to 100% accuracy on the training set, it achieved around 88% accuracy on the test set.
 
 # Task 5: Find the best possible model with existing software
 
@@ -185,7 +190,4 @@ acc <- c(0.406,  0.632,  0.36 ,  0.712,  0.796,  0.873,  0.872,  0.878,
 acc <- c(0.409,  0.147,  0.121,  0.608,  0.636,  0.793,  0.718,  0.483,
         0.527,  0.268) # probably not enough epochs to fit
 
-
-
 ```
-
