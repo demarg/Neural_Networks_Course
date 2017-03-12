@@ -107,8 +107,8 @@ def ex1and2(distance_metric):
 
 
 # TODO uncomment
-#for dist_metric in ['cityblock', 'cosine', 'euclidean', 'l1', 'l2', 'manhattan']:
-#    ex1and2(dist_metric)
+# for dist_metric in ['cityblock', 'cosine', 'euclidean', 'l1', 'l2', 'manhattan']:
+#     ex1and2(dist_metric)
 
 
 
@@ -240,7 +240,7 @@ class PerceptronClassifier:
             digits = np.array(range(10))
             try:
                 # first sample where the correct node is not the most activated
-                i, a = next((i, a) for (i, a) in zip(range(len(y)), act) if (a[digits != y[i]] >= a[y[i]]).any())
+                i, a = next((i, a) for (i, a) in enumerate(act) if (a[digits != y[i]] >= a[y[i]]).any())
             except StopIteration:
                 # if there is none, we're done
                 return True
@@ -276,11 +276,6 @@ class PerceptronClassifier:
         """ sigmoid function """
         return 1 / (1 + np.exp(-net))
 
-    def activation_drv(self, net):
-        """ derivative of the sigmoid function """
-        act = self.activation(net)
-        return act * (1 - act)
-
     def classify(self, X):
         X = self.prepend_ones(X)
 
@@ -291,20 +286,24 @@ class PerceptronClassifier:
         return y
 
 
+print("df = data.frame()")
 for rate in [1., 0.5, 0.1, 0.05, 0.01]:
-    print("Learning rate: {}".format(rate))
 
     cls = PerceptronClassifier()
     acc = []
-    for i in range(40):
+    train_pred = cls.classify(train_in)
+    acc.append(np.sum(train_pred == train_out) / len(train_out))
+    for i in range(30):
         converged = cls.train(train_in, train_out, learning_rate = rate, max_iter = 100)
         train_pred = cls.classify(train_in)
         acc.append(np.sum(train_pred == train_out) / len(train_out))
         if converged:
             break
 
-    print(acc)
+    print("df.add = data.frame(acc = c({}))".format(", ".join(str(a) for a in acc)))
 
     test_pred = cls.classify(test_in)
-    print("Test accuracy:")
-    print(np.sum(test_pred == test_out) / len(test_out))
+    print("df.add$rate = {}".format(rate))
+    print("df.add$test_acc = {}".format(np.sum(test_pred == test_out) / len(test_out)))
+    print("df.add$iter = seq(0, by = 100, length.out = nrow(df.add))")
+    print("df = rbind(df, df.add)")
