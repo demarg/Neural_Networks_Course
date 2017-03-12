@@ -106,9 +106,8 @@ def ex1and2(distance_metric):
 
 
 
-# TODO uncomment
-# for dist_metric in ['cityblock', 'cosine', 'euclidean', 'l1', 'l2', 'manhattan']:
-#     ex1and2(dist_metric)
+for dist_metric in ['cityblock', 'cosine', 'euclidean', 'l1', 'l2', 'manhattan']:
+    ex1and2(dist_metric)
 
 
 
@@ -191,18 +190,17 @@ class BayesClassifier:
         return accuracy
 
 
-# TODO uncomment
-# classifiers = [BayesClassifier(rows) for rows in range(1, 17)]
+classifiers = [BayesClassifier(rows) for rows in range(1, 17)]
 
-# train_acc = [cls.report_accuracy("training", train_5, train_7) for cls in classifiers]
-# test_acc = [cls.report_accuracy("test", test_5, test_7) for cls in classifiers]
+train_acc = [cls.report_accuracy("training", train_5, train_7) for cls in classifiers]
+test_acc = [cls.report_accuracy("test", test_5, test_7) for cls in classifiers]
 
-# print("Rows:")
-# print([cls.rows for cls in classifiers])
-# print("Training set accuracy:")
-# print(train_acc)
-# print("Test set accuracy:")
-# print(test_acc)
+print("Rows:")
+print([cls.rows for cls in classifiers])
+print("Training set accuracy:")
+print(train_acc)
+print("Test set accuracy:")
+print(test_acc)
 
 
 
