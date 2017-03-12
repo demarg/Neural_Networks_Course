@@ -101,8 +101,10 @@ def ex1and2(distance_metric):
 
 
 
-for dist_metric in ['cityblock', 'cosine', 'euclidean', 'l1', 'l2', 'manhattan']:
-    ex1and2(dist_metric)
+# TODO uncomment
+#for dist_metric in ['cityblock', 'cosine', 'euclidean', 'l1', 'l2', 'manhattan']:
+#    ex1and2(dist_metric)
+
 
 
 #####  Exercise 3
@@ -145,3 +147,7 @@ def classify(data):
     ls = lowsum(data, 3)
     binned = bin_features(ls)
     return np.where(post_5[binned] > post_7[binned], 5, 7)
+
+
+
+##### Exercise 4
