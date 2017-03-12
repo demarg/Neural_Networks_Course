@@ -6,9 +6,14 @@ output:
   pdf_document:
     fig_caption: yes
 header-includes:
+  - \usepackage{float}
   - \usepackage{subfig}
   - \newcommand{\argmin}{\operatornamewithlimits{argmin}}
 ---
+
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(fig.pos = 'H!')
+```
 
 # Introduction
 
@@ -23,9 +28,9 @@ First it is a good idea to identify which of the digits $d = 0, 1, ..., 9$ are d
 
 From here, we calculated the distances between the centers $dist_{ij} = dist(c_i, c_j)$ for $i, j = 0, 1, ..., 9$ of the 10 clouds resembling the digits and observe which ones lie close or far from each other in the form of a heatmap:
 
-\begin{figure}[h]%
+\begin{figure}[H]%
     \centering
-    \includegraphics[width=10cm]{out/euclidean_digit-dists.png}%
+    \includegraphics[width=10cm]{out/1_euclidean_digit-dists.png}%
     \caption{Euclidean distance between centers. Smaller values indicate more proximity in the 256-dimensional space.}%
     \label{fig:euclidean_dist}%
 \end{figure}
@@ -63,11 +68,11 @@ capitalize <- function(x) {
 
 size = "5.5"
 for (dist in c('cityblock', 'cosine', 'euclidean', 'l1', 'l2', 'manhattan')) {
-  cat(paste0('\\begin{figure}[h]%
+  cat(paste0('\\begin{figure}[H]%
     \\centering
-    \\subfloat[Digit distances]{{\\includegraphics[width=', size, 'cm]{out/', dist, '_digit-dists.png} }}%
-    \\subfloat[Training confusion matrix]{{\\includegraphics[width=', size, 'cm]{out/', dist, '_training_confusion_matrix.png} }}%
-    \\subfloat[Test confusion matrix]{{\\includegraphics[width=', size, 'cm]{out/', dist, '_test_confusion_matrix.png} }}%
+    \\subfloat[Digit distances]{{\\includegraphics[width=', size, 'cm]{out/1_', dist, '_digit-dists.png} }}%
+    \\subfloat[Training confusion matrix]{{\\includegraphics[width=', size, 'cm]{out/2_', dist, '_training_confusion_matrix.png} }}%
+    \\subfloat[Test confusion matrix]{{\\includegraphics[width=', size, 'cm]{out/2_', dist, '_test_confusion_matrix.png} }}%
     \\caption{', capitalize(dist), '}%
     \\label{fig:example}%
 \\end{figure}
@@ -100,7 +105,7 @@ $$ P(D = d' \mid x') \propto P(x' \mid D = d') P(D = d') $$
 
 The most successful classifier was the one which summed the lowest 2 rows of the 16 x 16 matrix. The posterior distributions for both digits were summarized in the following plot:
 
-\begin{figure}[h]%
+\begin{figure}[H]%
     \centering
     \includegraphics[width=10cm]{out/3_posteriors_2.png}%
     \caption{Histograms of posterior probabilities for binned $x'$ for digit 5 and 7}%
@@ -123,9 +128,40 @@ ggplot(df, aes(x = Rows, y = Accuracy, colour = Set)) + geom_line() + theme_bw()
 
 
 # Task 4: Implement a multi-class perceptron algorithm
+Some text:
 
+```{r echo = F, warning=F, fig.height=2.5, fig.width=4, fig.cap="Convergence of perceptron for different learning rates"}
+df = data.frame()
+df.add = data.frame(acc = c(0.145284124194, 0.185120093732, 0.196250732279, 0.195079086116, 0.193321616872, 0.193321616872, 0.193321616872, 0.19273579379, 0.193907439953, 0.194493263035, 0.193321616872, 0.193321616872, 0.193321616872, 0.193321616872, 0.193907439953, 0.193321616872, 0.193907439953, 0.193321616872, 0.193321616872, 0.193321616872, 0.193321616872, 0.193907439953, 0.193907439953, 0.193907439953, 0.193907439953, 0.193907439953, 0.193907439953, 0.193907439953, 0.193321616872, 0.193907439953, 0.193321616872))
+df.add$rate = 1.0
+df.add$test_acc = 0.218
+df.add$iter = seq(0, by = 100, length.out = nrow(df.add))
+df = rbind(df, df.add)
+df.add = data.frame(acc = c(0.104276508494, 0.15992970123, 0.181605155243, 0.190392501465, 0.191564147627, 0.193907439953, 0.190978324546, 0.19273579379, 0.193321616872, 0.192149970709, 0.19273579379, 0.193321616872, 0.193907439953, 0.19273579379, 0.19273579379, 0.193321616872, 0.193907439953, 0.193907439953, 0.193907439953, 0.19273579379, 0.193321616872, 0.193321616872, 0.193321616872, 0.193907439953, 0.193321616872, 0.193907439953, 0.193321616872, 0.193321616872, 0.193321616872, 0.194493263035, 0.193907439953))
+df.add$rate = 0.5
+df.add$test_acc = 0.218
+df.add$iter = seq(0, by = 100, length.out = nrow(df.add))
+df = rbind(df, df.add)
+df.add = data.frame(acc = c(0.0720562390158, 0.603983596954, 0.837727006444, 0.886936145284, 0.908611599297, 0.921499707088, 0.919156414763, 0.920913884007, 0.93848857645, 0.949619214997, 0.949619214997, 0.953719976567, 0.962507322789, 0.974223784417, 0.970123022847, 0.980082015231, 0.984182776801, 0.983011130639, 0.98769771529, 0.994141769186, 0.992384299941, 0.998828353837, 1.0))
+df.add$rate = 0.1
+df.add$test_acc = 0.88
+df.add$iter = seq(0, by = 100, length.out = nrow(df.add))
+df = rbind(df, df.add)
+df.add = data.frame(acc = c(0.104862331576, 0.714704159344, 0.854130052724, 0.884007029877, 0.903339191564, 0.93028705331, 0.8769771529, 0.937902753368, 0.945518453427, 0.939660222613, 0.956649091974, 0.96309314587, 0.961335676626, 0.966022261277, 0.969537199766, 0.983011130639, 0.982425307557, 0.977738722906, 0.990626830697, 0.994141769186, 0.99589923843, 1.0))
+df.add$rate = 0.05
+df.add$test_acc = 0.879
+df.add$iter = seq(0, by = 100, length.out = nrow(df.add))
+df = rbind(df, df.add)
+df.add = data.frame(acc = c(0.0433509080258, 0.407732864675, 0.515524311658, 0.736965436438, 0.831282952548, 0.851786760398, 0.87287639133, 0.907439953134, 0.899238429994, 0.888693614528, 0.908025776216, 0.920913884007, 0.929701230228, 0.941417691857, 0.951376684241, 0.959578207381, 0.967779730521, 0.971880492091, 0.97539543058, 0.980082015231, 0.983011130639, 0.98359695372, 0.987111892209, 0.99179847686, 0.994727592267, 0.998828353837, 1.0))
+df.add$rate = 0.01
+df.add$test_acc = 0.874
+df.add$iter = seq(0, by = 100, length.out = nrow(df.add))
+df = rbind(df, df.add)
 
-
+df$rate = as.factor(df$rate)
+ggplot(df[df$iter < 2800, ], aes(x = iter, y = acc, colour = rate)) + geom_line() + theme_bw() + 
+  labs(x = "Iterations", y = "Accuracy", colour = "Learning rate")
+```
 
 
 
