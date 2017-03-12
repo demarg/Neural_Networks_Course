@@ -131,5 +131,25 @@ ggplot(df, aes(x = Rows, y = Accuracy, colour = Set)) + geom_line() + theme_bw()
 
 # Task 5: Find the best possible model with existing software
 
-Michael Nielsen presents his Neural Networks software in his book "Neural Networks and Deep Learning" (http://neuralnetworksanddeeplearning.com/index.html). We adapted his code to run it over our data set. 
+Michael Nielsen presents his Neural Networks software in his book "Neural Networks and Deep Learning" (http://neuralnetworksanddeeplearning.com/index.html). We adapted his code to run it over our data set, which required us to create our own data wrapper. Simulations were conducted systematically: For a given amount of neurons $N = \{30, 100\}$, for batch sizes B = $\{5, 10, 50\}$, a geometric series of learning rates in the interval [0.05, 25.6] was taken and run over 20 epochs to see how the neural network fitted the data and which accuracy it obtained on the test set.
+
+
+
+```{r}
+epochs = 20
+learn_rate = c(0.05,   0.1 ,   0.2 ,   0.4 ,   0.8 ,   1.6 ,   3.2 ,   6.4 ,
+        12.8 ,  25.6)
+
+### 1 hidden layer
+#mini-batch 10, hidden neurons 30
+acc <- c(0.406,  0.632,  0.36 ,  0.712,  0.796,  0.873,  0.872,  0.878,
+        0.837,  0.165)
+
+#mini-batch 10, hidden neurons 100
+acc <- c(0.409,  0.147,  0.121,  0.608,  0.636,  0.793,  0.718,  0.483,
+        0.527,  0.268) # probably not enough epochs to fit
+
+
+
+```
 

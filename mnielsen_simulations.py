@@ -10,6 +10,7 @@ Simulations
 from __future__ import division
 import os
 import numpy as np
+import importlib as imp
 
 # Set working directory to location of this file
 try:
@@ -19,12 +20,38 @@ try:
 except:
     pass
 
-import mnielsen_network 
-import own_wrapper
 
-test = TupleUp(test_in, test_out)
-train = TupleUp(train_in, train_out)
+from mnielsen_network import Network
+from own_wrapper import training_data
+from own_wrapper import test_data
 
+
+
+# Simulations
+
+## Take mini-batch size of 10, 30 hidden neurons as in example in book
+
+### vary learning rate
 net = Network([256, 30, 10])
 
-net.SGD(train, 30, 10, 3.0, test_data=test)
+lr = np.array([2**x for x in range(10)], dtype = 'float') / 20
+out = np.zeros((20, 10))
+
+
+for i in range(10):
+    net = Network([256, 30, 10])
+    out[:, i] = net.SGD(training_data, 20, 10, lr[i], test_data=test_data)
+    print(i)
+    
+
+
+
+
+
+
+
+
+
+
+
+

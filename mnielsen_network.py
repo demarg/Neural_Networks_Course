@@ -9,12 +9,15 @@ simple, easily readable, and easily modifiable.  It is not optimized,
 and omits many desirable features.
 """
 
+from __future__ import division
+
 #### Libraries
 # Standard library
 import random
 
 # Third-party libraries
 import numpy as np
+
 
 class Network(object):
 
@@ -53,6 +56,7 @@ class Network(object):
         tracking progress, but slows things down substantially."""
         if test_data: n_test = len(test_data)
         n = len(training_data)
+        out = np.zeros(epochs)
         for j in xrange(epochs):
             random.shuffle(training_data)
             mini_batches = [
@@ -60,11 +64,13 @@ class Network(object):
                 for k in xrange(0, n, mini_batch_size)]
             for mini_batch in mini_batches:
                 self.update_mini_batch(mini_batch, eta)
-            if test_data:
-                print "Epoch {0}: {1} / {2}".format(
-                    j, self.evaluate(test_data), n_test)
-            else:
-                print "Epoch {0} complete".format(j)
+            out[j] = self.evaluate(test_data) / n_test
+            #if test_data:
+            #    print "Epoch {0}: {1} / {2}".format(
+            #        j, self.evaluate(test_data), n_test)
+            #else:
+            #    print "Epoch {0} complete".format(j)
+        return(out)
 
     def update_mini_batch(self, mini_batch, eta):
         """Update the network's weights and biases by applying
