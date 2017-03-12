@@ -248,7 +248,7 @@ class PerceptronClassifier:
             # update weights
             factors = np.zeros(10)
             factors = np.where(a >= a[correct], -1, 0) # reduce weights of nodes that were too active
-            factors[correct] = 1                      # increase weights for the node that should have won
+            factors[correct] = 1                       # increase weights for the node that should have won
             self.w += learning_rate * np.transpose(np.array([X[i] * f for f in factors]))
 
             iteration += 1
