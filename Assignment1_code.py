@@ -188,9 +188,17 @@ class BayesClassifier:
         correct_7 = np.sum(self.classify(in_7) == 7)
         accuracy = (correct_5 + correct_7) / (len(in_5) + len(in_7))
         print("Accuracy in {} set with {} rows: {:.2f}".format(set_name, self.rows, accuracy))
+        return accuracy
 
 
-for rows in range(1, 17):
-    cls = BayesClassifier(rows)
-    #cls.report_accuracy("training", train_5, train_7)
-    cls.report_accuracy("test", test_5, test_7)
+classifiers = [BayesClassifier(rows) for rows in range(1, 17)]
+
+train_acc = [cls.report_accuracy("training", train_5, train_7) for cls in classifiers]
+test_acc = [cls.report_accuracy("test", test_5, test_7) for cls in classifiers]
+
+print("Rows:")
+print([cls.rows for cls in classifiers])
+print("Training set accuracy:")
+print(train_acc)
+print("Test set accuracy:")
+print(test_acc)
