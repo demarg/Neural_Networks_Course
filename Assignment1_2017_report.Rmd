@@ -2,10 +2,7 @@
 title: "Assignment 1: Classifying Images of Handwritten Digits"
 author: "Anonymous & Anonymous"
 date: "12 March 2017"
-output: 
-  pdf_document:
-      fig_width: 4
-      fig_height: 3
+output: pdf_document
 
 ---
 
@@ -27,27 +24,9 @@ From here, we calculated the distances between the centers $dist_{ij} = dist(c_i
 
 # Task 2: Implement and evaluate the simplest classfier
 
-```{r fig.width=4, fig.height=3,echo=FALSE}
-library(png)
-library(grid)
-img <- readPNG("out/euclidean_training_confusion_matrix.png")
-img2 <- readPNG("out/cityblock_training_confusion_matrix.png")
-img3 <- readPNG("out/cosine_training_confusion_matrix.png")
- grid.raster(img, img2, img3)
-```
+The distance measure developed before could now be used to clasify the digits.
 
 
-<div style="width:100px; height=70px">
-![Euclidean distance](out/euclidean_training_confusion_matrix.png) | ![Cityblock distance](out/cityblock_training_confusion_matrix.png) | ![Cosine distance](out/cosine_training_confusion_matrix.png)
-</div>
-
-
-
-![L1 distance](out/l1_training_confusion_matrix.png) ![L2 distance](out/l2_training_confusion_matrix.png) ![Manhattan distance](out/manhattan_training_confusion_matrix.png)
-
-```{r, out.wi}
-
-```
 
 
 # Task 3: Implement a Bayes Rule classifier
