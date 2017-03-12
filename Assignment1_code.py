@@ -191,14 +191,75 @@ class BayesClassifier:
         return accuracy
 
 
-classifiers = [BayesClassifier(rows) for rows in range(1, 17)]
+# TODO uncomment
+# classifiers = [BayesClassifier(rows) for rows in range(1, 17)]
 
-train_acc = [cls.report_accuracy("training", train_5, train_7) for cls in classifiers]
-test_acc = [cls.report_accuracy("test", test_5, test_7) for cls in classifiers]
+# train_acc = [cls.report_accuracy("training", train_5, train_7) for cls in classifiers]
+# test_acc = [cls.report_accuracy("test", test_5, test_7) for cls in classifiers]
 
-print("Rows:")
-print([cls.rows for cls in classifiers])
-print("Training set accuracy:")
-print(train_acc)
-print("Test set accuracy:")
-print(test_acc)
+# print("Rows:")
+# print([cls.rows for cls in classifiers])
+# print("Training set accuracy:")
+# print(train_acc)
+# print("Test set accuracy:")
+# print(test_acc)
+
+
+
+##### Exercise 4
+
+print("\nExercise 4\n")
+
+# input    x: n   x 257
+# weights  w: 257 x 10
+# outputs  y: n   x 10
+
+# y = x*w
+# nx257 * 257x10 = nx10
+class PerceptronClassifier:
+    def __init__(self, X, y, learning_rate = 0.03):
+        # initialize weights
+        self.w = np.zeros((257, 10))
+
+        X = self.prepend_ones(X)
+
+        # prepare Y
+        Y = np.zeros((len(y), 10))
+        for i in range(len(y)):
+            Y[i, int(y[i])] = 1
+
+        # train the network
+        net = self.net(X)
+        delta_w = (Y - self.activation(net)) * self.activation_drv(net)
+        print(delta_w.shape)
+        delta_w = np.matmul(delta_w, X)
+        delta_w = learning_rate * delta_w
+        print(delta_w)
+
+    def prepend_ones(self, X):
+        n = X.shape[0]
+        ones = np.array([1] * n).reshape(-1, 1)
+        return np.hstack([ones, X])
+
+    def net(self, X):
+        return np.matmul(X, self.w)
+
+    def activation(self, net):
+        """ sigmoid function """
+        return 1 / (1 + np.exp(-net))
+
+    def activation_drv(self, net):
+        """ derivative of the sigmoid function """
+        act = self.activation(net)
+        return act * (1 - act)
+
+    def classify(self, X):
+        X = self.prepend_ones(X)
+
+        net = self.net(X)
+        act = self.activation(net)
+        y = np.argmax(act, 1)
+        print(y)
+
+cls = PerceptronClassifier(train_in, train_out)
+print(cls.classify(test_in))
