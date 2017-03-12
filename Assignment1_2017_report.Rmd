@@ -2,7 +2,9 @@
 title: "Assignment 1: Classifying Images of Handwritten Digits"
 author: "Anonymous & Anonymous"
 date: "12 March 2017"
-output: pdf_document
+output: 
+  pdf_document:
+    fig_caption: yes
 header-includes:
   - \usepackage{subfig}
   - \newcommand{\argmin}{\operatornamewithlimits{argmin}}
@@ -37,12 +39,12 @@ The distance measure developed before could now be used to classify the digits. 
 For each of these measures, the integer vector resulting from checking each sequence from the training set with $c_d$ was then compared to the vector of true digits. This was done for both the training set and the test set:
 
 ```{r echo = F}
-measure <- c('cityblock', 'cosine', 'euclidean', 'l1', 'l2', 'manhattan')
-trainset <- c(0.7656707674282367, 0.8605741066198008,0.8635032220269478, 0.7656707674282367,  0.8635032220269478, 0.7656707674282367)
-trainset <- round(trainset, 2)
-testset <- c(0.721, 0.799, 0.804, 0.721, 0.804, 0.721)
-testset <- round(testset, 2)
-accs <- data.frame(measure, trainset, testset)
+Measure <- c('cityblock', 'cosine', 'euclidean', 'l1', 'l2', 'manhattan')
+Train <- c(0.7656707674282367, 0.8605741066198008,0.8635032220269478, 0.7656707674282367,  0.8635032220269478, 0.7656707674282367)
+Train <- round(Train, 2)
+Test <- c(0.721, 0.799, 0.804, 0.721, 0.804, 0.721)
+Test <- round(Test, 2)
+accs <- data.frame(Measure, Train, Test)
 library(knitr)
 kable(accs)
 ```
@@ -105,25 +107,25 @@ The most successful classifier was the one which summed the lowest 2 rows of the
     \label{fig:posteriors_binned}%
 \end{figure}
 
-The posterior distributions indicate that from the 4th bin upwards (starting at around -20.5 in our arbitrary unit space), $x$ should be classified as a **5**, otherwise as a **7**. This achieved an accuracy of 92% on the training set and, surprisingly, an even larger accuracy of 94% on the test set
+The posterior distributions indicate that from the 4th bin upwards (starting at around -20.5 in our arbitrary unit space), $x$ should be classified as a **5**, otherwise as a **7**. This achieved an accuracy of 92% on the training set and, rather surprisingly, an even larger accuracy of 94% on the test set. Overall, taking between 1 and 4 lowest rows of the 16 x 16 matrix resulted in a high accuracy:
 
-
-
-```{r}
+```{r echo = F, warning=F, fig.height=2.5, fig.width=4, fig.cap="Classification accuracy for amount of lower rows chosen"}
 Rows <- c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
 Trainingset <- c(0.90551181102362199, 0.92125984251968507, 0.92519685039370081, 0.91338582677165359, 0.89370078740157477, 0.87401574803149606, 0.86614173228346458, 0.87007874015748032, 0.87401574803149606, 0.86614173228346458, 0.86220472440944884, 0.82283464566929132, 0.80314960629921262, 0.77165354330708658, 0.77952755905511806, 0.77952755905511806)
 Testset <- c(0.90756302521008403, 0.94117647058823528, 0.9327731092436975, 0.91596638655462181, 0.89915966386554624, 0.84873949579831931, 0.83193277310924374, 0.81512605042016806, 0.82352941176470584, 0.77310924369747902, 0.78151260504201681, 0.72268907563025209, 0.72268907563025209, 0.72268907563025209, 0.68907563025210083, 0.68907563025210083)
-plot(Rows, Trainingset)
-plot(Rows, Testset)
+
+df <- data.frame(Rows = rep(Rows, 2), Accuracy = c(Trainingset, Testset), Set = c(rep("Train", 16), rep("Test", 16)))
 
 library(ggplot2)
-ggplot()
-
+ggplot(df, aes(x = Rows, y = Accuracy, colour = Set)) + geom_line() + theme_bw()
 ```
 
 
 
 # Task 4: Implement a multi-class perceptron algorithm
+
+
+
 
 
 
