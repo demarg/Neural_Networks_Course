@@ -1,15 +1,6 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import division
-import os
-import numpy as np
-import matplotlib.pyplot as plt
-from matplotlib import rcParams
-from sklearn import metrics
-from plot_confusion import plot_confusion_matrix
-
-rcParams.update({'figure.autolayout': True})
-
 
 # Set working directory to location of this file
 try:
@@ -18,6 +9,16 @@ try:
     os.chdir(dname)
 except:
     pass
+
+
+import os
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib import rcParams
+from sklearn import metrics
+from plot_confusion import plot_confusion_matrix
+
+rcParams.update({'figure.autolayout': True})
 
 
 # Our data
