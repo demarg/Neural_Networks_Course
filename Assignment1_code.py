@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import division
+import os
 
 # Set working directory to location of this file
 try:
@@ -11,7 +12,6 @@ except:
     pass
 
 
-import os
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import rcParams
@@ -215,31 +215,59 @@ print("\nExercise 4\n")
 # outputs  y: n   x 10
 
 # y = x*w
-# nx257 * 257x10 = nx10
+# (n x 257) * (257 x 10) = n x 10
 class PerceptronClassifier:
-    def __init__(self, X, y, learning_rate = 0.03):
-        # initialize weights
-        self.w = np.zeros((257, 10))
+    def __init__(self):
+        # initialize weights randomly
+        self.w = np.random.rand(257, 10)
+
+
+    def train(self, X, y, learning_rate = 0.03, max_iter = -1):
+        """
+        Train the network by Generalized Perceptron Algorithm (Duda et al.)
+        Return True if 100% accuracy on training set reached before max_iter iterations.
+        """
+        y = y.astype('int')
 
         X = self.prepend_ones(X)
+        Y = self.code_y(y)
 
-        # prepare Y
-        Y = np.zeros((len(y), 10))
-        for i in range(len(y)):
-            Y[i, int(y[i])] = 1
+        iteration = 0
+        while iteration != max_iter:
+            net = self.net(X)
+            act = self.activation(net)
 
-        # train the network
-        net = self.net(X)
-        delta_w = (Y - self.activation(net)) * self.activation_drv(net)
-        print(delta_w.shape)
-        delta_w = np.matmul(delta_w, X)
-        delta_w = learning_rate * delta_w
-        print(delta_w)
+            digits = np.array(range(10))
+            try:
+                # first sample where the correct node is not the most activated
+                i, a = next((i, a) for (i, a) in zip(range(len(y)), act) if (a[digits != y[i]] >= a[y[i]]).any())
+            except StopIteration:
+                # if there is none, we're done
+                return True
+
+            correct = y[i]
+
+            # update weights
+            factors = np.zeros(10)
+            factors = np.where(a >= a[correct], -1, 0) # reduce weights of nodes that were too active
+            factors[correct] = 1                      # increase weights for the node that should have won
+            self.w += learning_rate * np.transpose(np.array([X[i] * f for f in factors]))
+
+            iteration += 1
+
+        return False
+
 
     def prepend_ones(self, X):
         n = X.shape[0]
         ones = np.array([1] * n).reshape(-1, 1)
         return np.hstack([ones, X])
+
+    def code_y(self, y):
+        Y = np.zeros((len(y), 10))
+        for i in range(len(y)):
+            Y[i, int(y[i])] = 1
+        return Y
 
     def net(self, X):
         return np.matmul(X, self.w)
@@ -258,8 +286,25 @@ class PerceptronClassifier:
 
         net = self.net(X)
         act = self.activation(net)
+        #print(act.shape)
         y = np.argmax(act, 1)
-        print(y)
+        return y
 
-cls = PerceptronClassifier(train_in, train_out)
-print(cls.classify(test_in))
+
+for rate in [1., 0.5, 0.1, 0.05, 0.01]:
+    print("Learning rate: {}".format(rate))
+
+    cls = PerceptronClassifier()
+    acc = []
+    for i in range(40):
+        converged = cls.train(train_in, train_out, learning_rate = rate, max_iter = 100)
+        train_pred = cls.classify(train_in)
+        acc.append(np.sum(train_pred == train_out) / len(train_out))
+        if converged:
+            break
+
+    print(acc)
+
+    test_pred = cls.classify(test_in)
+    print("Test accuracy:")
+    print(np.sum(test_pred == test_out) / len(test_out))
