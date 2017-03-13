@@ -54,7 +54,7 @@ library(knitr)
 kable(accs)
 ```
 
-Accuracies on both the training set and test set were relatively good. This shows that a distance measure explains quite a lot of the differences between the digits. Interestingly, Cosine, Euclidean, and L2 outperformed the others (with Cosine being very slighlty worse than Euclidean and L2, which had equal scores). This should be due to the nature of how the distance is measured; more specifically, whether the formula for the measure includes squared terms or only non-squared terms. This makes sense, intuitively, because squaring allows for describing a relationship in a second-order polynomial, which pronounces large differences that can aid in differentiating between digits.
+Accuracies on both the training set and test set were relatively good. This shows that a distance measure explains quite a lot of the differences between the digits. Interestingly, Cosine, Euclidean, and L2 outperformed the others (with Cosine being very slightly worse than Euclidean and L2, which had equal scores). This should be due to the nature of how the distance is measured; more specifically, whether the formula for the measure includes squared terms or only non-squared terms. This makes sense, intuitively, because squaring allows for describing a relationship in a second-order polynomial, which pronounces large differences that can aid in differentiating between digits.
 Our confidence in working with the Euclidean measure for digit classification was strengthened when looking at the accuracies.
 
 To get a more nuanced view, confusion matrices were created. This was again done with the training set (column b) and the test set (column c):
