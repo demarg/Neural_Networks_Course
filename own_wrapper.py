@@ -8,7 +8,6 @@ Created on Sun Mar 12 19:21:32 2017
 from __future__ import division
 import os
 import numpy as np
-import mnist_loader
 
 # Set working directory to location of this file
 try:
