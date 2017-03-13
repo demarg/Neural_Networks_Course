@@ -194,7 +194,7 @@ The rationale behind this approach came from the following rules of thumb and in
 
 The declared winner with 89.0% accuracy was, as expected, a simple Neural Network which only included one hidden layer, condensing the input layer of 256 to just 15 neurons, before predicting the 10-neuron output layer. The learning rate was $\eta = 6.4$. It achieved the winning accuracy at 13 epochs. Below is a plot visualizing the convergence and its comparison to two other learning rates.
 
-```{r fig.height=2.5, fig.width=4, fig.cap="Winning Neural Network test accuracy over 20 epochs"}
+```{r echo = F, fig.height=2.5, fig.width=4, fig.cap="Winning Neural Network test accuracy over 20 epochs"}
 epochs <- 1:20
 acc <- c(0.626,  0.727,  0.8  ,  0.833,  0.826,  0.87 ,  0.855,  0.854,
         0.873,  0.882,  0.874,  0.839,  0.873,  0.89 ,  0.885,  0.877,
@@ -215,7 +215,7 @@ plot_dat <- data.frame(Epochs = rep(1:20, 3), Accuracy = c(acc, acc_2, acc_3), R
 ggplot(plot_dat, aes(x = Epochs, y = Accuracy, colour = Rate)) + geom_line() + theme_bw() + geom_hline(yintercept = 0.89, colour = "black", linetype = "dotted")
 ```
 
-Unfortunately networks with more than one hidden layer did not perform better than the simple 1-layer networks. This is probably due to the fact that (1) there is not too much data available and (2) the data is linearly separable.
+Unfortunately networks with more than one hidden layer did not perform better than the simple 1-layer networks. This is probably due to the fact that (1) there is not too much data available and (2) the data is linearly separable. Another factor that could have played a role was that there were not enough epochs allowed for the algorithm to reach a higher accuracy. A better time-accuracy tradeoff scheme might have changed the outcome.
 
 
 # Comparisons of Results
@@ -223,7 +223,7 @@ Unfortunately networks with more than one hidden layer did not perform better th
 The resulting accuracies from the different approaches are summarized in the table below.
 
 
-```{r include = F}
+```{r echo = F}
 epochs = 20
 learn_rate = c(0.05,   0.1 ,   0.2 ,   0.4 ,   0.8 ,   1.6 ,   3.2 ,   6.4 ,
         12.8 ,  25.6)
@@ -267,14 +267,12 @@ acc8 <- c( 0.361,  0.384,  0.473,  0.622,  0.744,  0.807,  0.832,  0.85 ,
 acc9 <- c(0.222,  0.224,  0.321,  0.352,  0.4  ,  0.346,  0.577,  0.451,
         0.273,  0.255)
 
-Method <- c("NN: 100 neurons, 1 layer", "NN: 30 neurons, 1 layer", "NN: 20 neurons, 1 layer", "NN: 15 neurons, 1 layer", "NN: 10 neurons, 1 layer", "NN: 30+30 neurons, 2 layers", "NN: 10+10 neurons, 2 layers", "NN: 5+2+5 neurons, 3 layers")
+Method <- c("Task 2 classifier: Euclidean distance", "Bayes classifier: 2 lowest rows","Single-layer perceptron: 10 nodes", "NN: 100 neurons, 1 layer", "NN: 30 neurons, 1 layer", "NN: 20 neurons, 1 layer", "NN: 15 neurons, 1 layer", "NN: 10 neurons, 1 layer", "NN: 30+30 neurons, 2 layers", "NN: 10+10 neurons, 2 layers", "NN: 5+2+5 neurons, 3 layers")
 
-max(acc9)
+Best_rate <- c("-", "-", "-", 1.6, 6.4, 6.4, 6.4, 6.4, 6.4, 6.4, 3.2)
+Accuracy <- c(0.8, "0.94 (binary)", 0.88, 0.793, 0.878, 0.881, 0.890, 0.869, 0.872, 0.850, 0.577) 
 
-Best_rate <- c(1.6, 6.4, 6.4, 6.4, 6.4, 6.4, 6.4, 3.2)
-Accuracy <- c(0.793, 0.878, 0.881, 0.890, 0.869, 0.872, 0.850, 0.577) 
-
-data.frame(Method, Best_rate, Accuracy)
-
+kableframe <- data.frame(Method, Best_rate, Test_Accuracy = Accuracy)
+kable(kableframe)
 
 ```
